@@ -20,10 +20,10 @@ touch $OUTFILE
 
 if [ $# -lt 3 ]
 then
-	echo "Using default value ${WRITESTR} for string to write" >> $OUTFILE
+	echo "Using default value ${WRITESTR} for string to write" | tee -a $OUTFILE
 	if [ $# -lt 1 ]
 	then
-		echo "Using default value ${NUMFILES} for number of files to write" >> $OUTFILE
+		echo "Using default value ${NUMFILES} for number of files to write" | tee -a $OUTFILE
 	else
 		NUMFILES=$1
 	fi	
@@ -35,7 +35,7 @@ fi
 
 MATCHSTR="The number of files are ${NUMFILES} and the number of matching lines are ${NUMFILES}"
 
-echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}" >> $OUTFILE
+echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}" | tee -a $OUTFILE
 
 rm -rf "${WRITEDIR}"
 
@@ -51,7 +51,7 @@ then
 	#This issue can also be resolved by using double square brackets i.e [[ ]] instead of using quotes.
 	if [ -d "$WRITEDIR" ]
 	then
-		echo "$WRITEDIR created" >> $OUTFILE
+		echo "$WRITEDIR created" | tee -a $OUTFILE
 	else
 		exit 1
 	fi
@@ -71,11 +71,11 @@ OUTPUTSTRING=$($APPDIR/finder.sh "$WRITEDIR" "$WRITESTR")
 rm -rf /tmp/aeld-data
 
 set +e
-echo ${OUTPUTSTRING} | grep "${MATCHSTR}" >> $OUTFILE
+echo ${OUTPUTSTRING} | grep "${MATCHSTR}" | tee -a $OUTFILE
 if [ $? -eq 0 ]; then
-	echo "success" >> $OUTFILE
+	echo "success" | tee -a $OUTFILE
 	exit 0
 else
-	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found" >> $OUTFILE
+	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found" | tee -a $OUTFILE
 	exit 1
 fi
