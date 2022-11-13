@@ -8,14 +8,22 @@ set -u
 NUMFILES=10
 WRITESTR=AELD_IS_FUN
 WRITEDIR=/tmp/aeld-data
-username=$(cat conf/username.txt)
+username=$(cat /etc/finder-app/conf/username.txt)
+APPDIR=$(dirname $0)
+
+OUTFILE=/tmp/assignment4-result.txt
+if [ -f $OUTFILE ]
+then
+    rm $OUTFILE
+fi
+touch $OUTFILE
 
 if [ $# -lt 3 ]
 then
-	echo "Using default value ${WRITESTR} for string to write"
+	echo "Using default value ${WRITESTR} for string to write" >> $OUTFILE
 	if [ $# -lt 1 ]
 	then
-		echo "Using default value ${NUMFILES} for number of files to write"
+		echo "Using default value ${NUMFILES} for number of files to write" >> $OUTFILE
 	else
 		NUMFILES=$1
 	fi	
@@ -27,12 +35,12 @@ fi
 
 MATCHSTR="The number of files are ${NUMFILES} and the number of matching lines are ${NUMFILES}"
 
-echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}"
+echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}" >> $OUTFILE
 
 rm -rf "${WRITEDIR}"
 
 # create $WRITEDIR if not assignment1
-assignment=`cat conf/assignment.txt`
+assignment=`cat /etc/finder-app/conf/assignment.txt`
 
 if [ $assignment != 'assignment1' ]
 then
@@ -43,7 +51,7 @@ then
 	#This issue can also be resolved by using double square brackets i.e [[ ]] instead of using quotes.
 	if [ -d "$WRITEDIR" ]
 	then
-		echo "$WRITEDIR created"
+		echo "$WRITEDIR created" >> $OUTFILE
 	else
 		exit 1
 	fi
@@ -54,20 +62,20 @@ fi
 
 for i in $( seq 1 $NUMFILES)
 do
-	./writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+	$APPDIR/writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
 done
 
-OUTPUTSTRING=$(./finder.sh "$WRITEDIR" "$WRITESTR")
+OUTPUTSTRING=$($APPDIR/finder.sh "$WRITEDIR" "$WRITESTR")
 
 # remove temporary directories
 rm -rf /tmp/aeld-data
 
 set +e
-echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
+echo ${OUTPUTSTRING} | grep "${MATCHSTR}" >> $OUTFILE
 if [ $? -eq 0 ]; then
-	echo "success"
+	echo "success" >> $OUTFILE
 	exit 0
 else
-	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found"
+	echo "failed: expected  ${MATCHSTR} in ${OUTPUTSTRING} but instead found" >> $OUTFILE
 	exit 1
 fi
